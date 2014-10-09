@@ -1,0 +1,46 @@
+# Ignore file for Visual Studio 2008/2012
+
+# use glob syntax
+syntax: glob
+
+# Ignore Visual Studio 2008 files
+*.obj
+/src/**/*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.scc
+*.orig
+*.git
+**/info.txt
+/src/**/[Bb]in
+/src/**/[Db]ebug*/
+/src/**/obj/
+/src/**/logs/
+*/[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+*.[Pp]ublish.xml
+UpgradeLog.*
+_UpgradeReport*/
+.svn/
+glob:release/Processor.App/Processor.App.vshost.exe.config
+glob:release/Processor.App/Processor.App.vshost.exe.manifest
+glob:release/Scheduler.App/Scheduler.App.vshost.exe.config
+glob:release/Scheduler.App/Scheduler.App.vshost.exe.manifest
+/lib/RavenDB Build/Samples/
