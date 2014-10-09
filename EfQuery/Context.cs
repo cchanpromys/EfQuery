@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using EfQuery.EfHelper;
 
 namespace EfQuery
 {
@@ -10,12 +11,23 @@ namespace EfQuery
             
         }
 
-        public DbSet<TaxDetail> TaxDetails { get; set; }
-        public DbSet<TaxScheduleDetail> TaxScheduleDetails { get; set; }
-        public DbSet<TaxSchedule> TaxSchedules { get; set; }
-        public DbSet<Organization> Organizations { get; set; }
-        public DbSet<OrganizationLocation> OrganizationLocations { get; set; }
-        public DbSet<Region> Regions { get; set; }
-        
+        public DbSet<Quote> Quotes { get; set; }
+        public DbSet<QuoteDetail> QuoteDetails { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Quote>()
+                        .HasOptional(a => a.QuoteDetails)
+                        .WithOptionalDependent()
+                        .WillCascadeOnDelete(true);
+        }
+    }
+
+    public class EntityFrameworkConfiguration : DbConfiguration
+    {
+        public EntityFrameworkConfiguration()
+        {
+            AddInterceptor(new SoftDeleteInterceptor());
+        }
     }
 }

@@ -1,6 +1,0 @@
-C:\CODE\EfQuery\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
-C:\CODE\EfQuery\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
-C:\CODE\EfQuery\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
-C:\CODE\EfQuery\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
-C:\CODE\EfQuery\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
-C:\CODE\EfQuery\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
