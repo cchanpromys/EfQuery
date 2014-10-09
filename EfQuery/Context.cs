@@ -13,14 +13,6 @@ namespace EfQuery
 
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<QuoteDetail> QuoteDetails { get; set; }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Quote>()
-                        .HasOptional(a => a.QuoteDetails)
-                        .WithOptionalDependent()
-                        .WillCascadeOnDelete(true);
-        }
     }
 
     public class EntityFrameworkConfiguration : DbConfiguration
