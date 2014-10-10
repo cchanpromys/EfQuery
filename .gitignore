@@ -44,3 +44,7 @@ glob:release/Processor.App/Processor.App.vshost.exe.manifest
 glob:release/Scheduler.App/Scheduler.App.vshost.exe.config
 glob:release/Scheduler.App/Scheduler.App.vshost.exe.manifest
 /lib/RavenDB Build/Samples/
+/EfQuery.Test/bin
+/EfQuery.Test/obj
+/EfQuery/bin
+/EfQuery/obj

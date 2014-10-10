@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="QueryTest.cs" />
     <Compile Include="SystemStatusTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

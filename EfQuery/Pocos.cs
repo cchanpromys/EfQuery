@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace EfQuery
 {
@@ -12,6 +14,9 @@ namespace EfQuery
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public decimal Price { get; set; }
+        public int Quality { get; set; }
+
         public SystemStatus SystemStatus { get; set; }
 
         public virtual Quote Quote { get; set; }
@@ -22,6 +27,12 @@ namespace EfQuery
         public int Id { get; set; }
         public string Name { get; set; }
         public SystemStatus SystemStatus { get; set; }
+
+        [NotMapped]
+        public decimal Total
+        {
+            get { return QuoteDetails.Sum(x =>  x.Price*x.Quality); }
+        }
 
         public virtual ICollection<QuoteDetail> QuoteDetails { get; set; }
     }
