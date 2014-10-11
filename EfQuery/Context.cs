@@ -71,6 +71,12 @@ namespace EfQuery
         
     //}
 
+//    Add-Migration -configuration EfQuery.Migrations.Configuration Init
+//update-database -configuration EfQuery.Migrations.Configuration
+
+//Add-Migration -configuration EfQuery.Migrations2.Configuration Init
+//update-database -configuration EfQuery.Migrations2.Configuration
+
     //http://msdn.microsoft.com/en-ca/data/jj680699.aspx
     //"Create only one DbConfiguration class for your application. This class specifies app-domain wide settings."
     public class EntityFrameworkConfiguration2 : DbConfiguration
