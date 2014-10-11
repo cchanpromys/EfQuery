@@ -10,7 +10,7 @@ namespace EfQuery.Test
     [TestFixture]
     public class QueryTest
     {
-        const int TotalQuotes = 10000;
+        const int TotalQuotes = 10;
         const int NumOfLineItemsPerQuote = 10;
         const int PageSize = 50000;
 
@@ -98,8 +98,23 @@ namespace EfQuery.Test
 
                     for (int j = 1; j <= NumOfLineItemsPerQuote; j++)
                     {
-                        q.QuoteDetails.Add(new QuoteDetail {Name = "Line Item " + j, Quality = j, Price = 10*j});
+                        q.QuoteDetails.Add(new QuoteDetail
+                            {
+                                Name = "Line Item " + j,
+                                Quality = j,
+                                Price = 10*j,
+                                Cost = 20*j
+                            });
                     }
+
+                    q.QuoteDetails.Add(new QuoteDetail
+                        {
+                            Name = "Deleted Item ",
+                            Quality = 999,
+                            Price = 999,
+                            Cost = 999,
+                            SystemStatus = SystemStatus.Deleted
+                        });
 
                     db.Quotes.Add(q);
 
@@ -107,6 +122,8 @@ namespace EfQuery.Test
                     if (i%500 == 0)
                         db.SaveChanges();
                 }
+
+                db.SaveChanges();
             }
         }
     }

@@ -32,11 +32,11 @@
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.2-beta2-31010\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.2-beta2-31010\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -54,6 +54,17 @@
     <Compile Include="EfHelper\SoftDeleteInterceptor.cs" />
     <Compile Include="EfHelper\SoftDeleteQueryVisitor.cs" />
     <Compile Include="Context.cs" />
+    <Compile Include="Mappings\QuoteMap.cs" />
+    <Compile Include="Migrations2\201410110007088_Init.cs" />
+    <Compile Include="Migrations2\201410110007088_Init.Designer.cs">
+      <DependentUpon>201410110007088_Init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations2\Configuration.cs" />
+    <Compile Include="Migrations\201410110006522_Init.cs" />
+    <Compile Include="Migrations\201410110006522_Init.Designer.cs">
+      <DependentUpon>201410110006522_Init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Pocos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +75,14 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations2\201410110007088_Init.resx">
+      <DependentUpon>201410110007088_Init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410110006522_Init.resx">
+      <DependentUpon>201410110006522_Init.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
