@@ -6,20 +6,26 @@ namespace EfQuery.Test
     [TestFixture]
     public class SystemStatusTest
     {
+        //TODO: This is to demo that running "Remove()" will soft delete an entity
+        //Without this, we will have to do .Where(x=> x.SystemStatus == SystemStatus.Active).Sum(x=> x.blah)
         [Test]
         public void CanSoftDelete()
         {
             //Arrange
             int id;
-            using (var db = new Context())
+            using (var db = new Context2())
             {
+                var p = new Product();
+                
+                db.Products.Add(p);
+
                 var q = new Quote
                 {
                     Name = "CanSoftDelete",
                     QuoteDetails = new[]
                         {
-                            new QuoteDetail {Name = "Item 1"},
-                            new QuoteDetail {Name = "Item 2"}
+                            new QuoteDetail {Name = "Item 1", Product = p},
+                            new QuoteDetail {Name = "Item 2", Product = p}
                         }
                 };
 
@@ -29,7 +35,7 @@ namespace EfQuery.Test
             }
 
             //Act
-            using (var db = new Context())
+            using (var db = new Context2())
             {
                 var q = db.Quotes.Single(x => x.Id == id);
                 db.Quotes.Remove(q);
@@ -37,59 +43,9 @@ namespace EfQuery.Test
             }
 
             //Assert
-            using (var db = new Context())
+            using (var db = new Context2())
             {
                 Assert.That(db.Quotes.Any(x => x.Id == id), Is.False);
-            }
-        }
-
-        [Test]
-        public void ChildrenSupportSoftDelete()
-        {
-            //Arrange
-            int id;
-            using (var db = new Context())
-            {
-                var p = new Product {Name = "Cable"};
-
-                var q = new Quote
-                {
-                    Name = "CanSoftDeleteChildren",
-                    QuoteDetails = new[]
-                        {
-                            new QuoteDetail {Name = "Item 1", Product = p},
-                            new QuoteDetail {Name = "Remove Me", Product = p}
-                        }
-                };
-
-                db.Quotes.Add(q);
-                db.SaveChanges();
-                id = q.Id;
-            }
-
-            //Act
-            using (var db = new Context2())
-            {
-                var q = db.Quotes.Single(x => x.Id == id);
-                var qd = q.QuoteDetails.Single(x => x.Name == "Remove Me");
-                //q.QuoteDetails.Remove(qd);
-                db.QuoteDetails.Remove(qd);
-                db.SaveChanges();
-            }
-
-            //Assert
-            using (var db = new Context2())
-            {
-                var q = db.Quotes.Single(x => x.Id == id);
-                Assert.That(q.QuoteDetails.Any(x => x.Name == "Remove Me"), Is.False);
-                Assert.That(q.QuoteDetails.Count(), Is.EqualTo(1));
-            }
-
-            using (var db = new Context())
-            {
-                var q = db.Quotes.Single(x => x.Id == id);
-                Assert.That(q.QuoteDetails.Any(x => x.Name == "Remove Me"), Is.True);
-                Assert.That(q.QuoteDetails.Count(), Is.EqualTo(2));
             }
         }
     }

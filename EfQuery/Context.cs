@@ -3,9 +3,16 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using EfQuery.EfHelper;
 using EfQuery.Mappings;
 
+
+//Add-Migration -configuration EfQuery.Migrations.Configuration Init
+//update-database -configuration EfQuery.Migrations.Configuration
+
+//Add-Migration -configuration EfQuery.Migrations2.Configuration Init
+//update-database -configuration EfQuery.Migrations2.Configuration
+
 namespace EfQuery
 {
-    //[DbConfigurationType(typeof(EntityFrameworkConfiguration))] 
+    [DbConfigurationType(typeof(EntityFrameworkConfiguration))] 
     public class Context : DbContext
     {
         public Context()
@@ -65,17 +72,11 @@ namespace EfQuery
         public DbSet<Product> Products { get; set; }
         public DbSet<FocusedWarehouse> Warehouses { get; set; }
     }
-    
-    //public class EntityFrameworkConfiguration : DbConfiguration
-    //{
-        
-    //}
 
-//    Add-Migration -configuration EfQuery.Migrations.Configuration Init
-//update-database -configuration EfQuery.Migrations.Configuration
+    public class EntityFrameworkConfiguration : DbConfiguration
+    {
 
-//Add-Migration -configuration EfQuery.Migrations2.Configuration Init
-//update-database -configuration EfQuery.Migrations2.Configuration
+    }
 
     //http://msdn.microsoft.com/en-ca/data/jj680699.aspx
     //"Create only one DbConfiguration class for your application. This class specifies app-domain wide settings."

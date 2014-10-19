@@ -10,8 +10,8 @@ namespace EfQuery.Test
     [TestFixture]
     public class QueryTest
     {
-        const int TotalQuotes = 10;
-        const int NumOfLineItemsPerQuote = 10;
+        const int TotalQuotes = 100000;
+        const int NumOfLineItemsPerQuote = 100;
         const int PageSize = 50000;
 
         class Report
@@ -20,37 +20,7 @@ namespace EfQuery.Test
             public decimal Total { get; set; }
         }
 
-        [Test]
-        public void DynamicSum()
-        {
-            var result = new List<Report>();
-
-            using (var db = new Context())
-            {
-                var sw = Stopwatch.StartNew();
-                for (int i = 0; i <= TotalQuotes/PageSize; i++)
-                {
-                    var reports = db.Quotes
-                                    .OrderBy(x=> x.Id)
-                                    .Skip(i*PageSize).Take(PageSize)
-                                    .Select(x => new Report
-                                        {
-                                            Name = x.Name,
-                                            Total = x.QuoteDetails.Sum(y => y.Quality*y.Price)
-                                        });
-
-                    result.AddRange(reports);
-                }
-                sw.Stop();
-                Console.WriteLine("Took {0}s", sw.ElapsedMilliseconds/1000.0);
-            }
-
-
-
-            //foreach (var r in result)
-            //    Console.WriteLine("{0} - ${1}", r.Name, r.Total);
-        }
-
+        //TODO: Demo how fast we can sum and multiply numbers
         [Test]
         public void ViewModelSum()
         {
@@ -62,21 +32,30 @@ namespace EfQuery.Test
                 for (int i = 0; i <= TotalQuotes / PageSize; i++)
                 {
                     var reports = db.Quotes
-                                    .AsNoTracking()
                                     .Include("QuoteDetails")
                                     .OrderBy(x => x.Id)
-                                    .Skip(i * PageSize).Take(PageSize)
+                                    .Skip(i*PageSize).Take(PageSize)
                                     .ToList()
                                     .Select(x => new Report
-                                    {
-                                        Name = x.Name,
-                                        Total = x.Total
-                                    });
+                                        {
+                                            Name = x.Name,
+                                            Total = x.Total
+                                        });
 
                     result.AddRange(reports);
                 }
+
                 sw.Stop();
-                Console.WriteLine("Took {0}s", sw.ElapsedMilliseconds / 1000.0);
+
+                var numQ = result.Count();
+                var numQdPerQ = db.Quotes.First().QuoteDetails.Count;
+
+                Console.WriteLine(
+                    "Took {0}s to process {1} Quotes. Each of them contains {2} line items. We did {3} addition and {3} multiplication all in memory.",
+                    sw.ElapsedMilliseconds/1000.0,
+                    numQ,
+                    numQdPerQ,
+                    numQ*numQdPerQ);
             }
 
             //foreach (var r in result)
@@ -98,13 +77,29 @@ namespace EfQuery.Test
 
                     for (int j = 1; j <= NumOfLineItemsPerQuote; j++)
                     {
-                        q.QuoteDetails.Add(new QuoteDetail
+                        var w = new Warehouse {Name = Guid.NewGuid().ToString()};
+
+                        db.Warehouses.Add(w);
+
+                        var p = new Product
+                            {
+                                Name = Guid.NewGuid().ToString(),
+                                Warehouse = w
+                            };
+
+                        db.Products.Add(p);
+
+                        var qd = new QuoteDetail
                             {
                                 Name = "Line Item " + j,
                                 Quality = j,
                                 Price = 10*j,
-                                Cost = 20*j
-                            });
+                                Cost = 20*j,
+                                Product = p
+                            };
+
+                        q.QuoteDetails.Add(qd);
+                        db.QuoteDetails.Add(qd);
                     }
 
                     q.QuoteDetails.Add(new QuoteDetail
@@ -113,7 +108,8 @@ namespace EfQuery.Test
                             Quality = 999,
                             Price = 999,
                             Cost = 999,
-                            SystemStatus = SystemStatus.Deleted
+                            SystemStatus = SystemStatus.Deleted,
+                            Product = new Product {Name = Guid.NewGuid().ToString()}
                         });
 
                     db.Quotes.Add(q);
