@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -60,6 +61,66 @@ namespace EfQuery.Test
 
             //foreach (var r in result)
             //    Console.WriteLine("{0} - ${1}", r.Name, r.Total);
+        }
+
+        [Test]
+        public void SelectnPlusOne()
+        {
+            var name = Guid.NewGuid().ToString();
+            using (var db = new Context())
+            {
+                var q = new Quote {Name = name, QuoteDetails = new Collection<QuoteDetail>()};
+
+                for (int i = 0; i < 500; i++)
+                {
+                    var w = new Warehouse();
+                    var p = new Product { Warehouse = w };
+                    q.QuoteDetails.Add(new QuoteDetail {Product = p});
+
+                    db.Warehouses.Add(w);
+                    db.Products.Add(p);
+                }
+
+                db.Quotes.Add(q);
+                db.SaveChanges();
+            }
+
+            //TODO: Select N plus one when you select Warehouse. Check Profiler
+            using (var db = new Context())
+            {
+                var sw = Stopwatch.StartNew();
+                var q = db.Quotes.Single(x => x.Name == name);
+
+                var warehouses = new List<Warehouse>();
+
+                foreach(var qd in q.QuoteDetails)
+                {
+                    warehouses.Add(qd.Product.Warehouse);
+                }
+
+                sw.Stop();
+                Console.WriteLine("Took {0} sec", sw.ElapsedMilliseconds/1000.0);
+            }
+
+
+            using (var db = new Context())
+            {
+                var sw = Stopwatch.StartNew();
+                var q = db.Quotes
+                          .Where(x => x.Name == name)
+                          .Include(x => x.QuoteDetails.Select(y => y.Product.Warehouse))
+                          .Single();
+
+                var warehouses = new List<Warehouse>();
+                foreach (var qd in q.QuoteDetails)
+                {
+                    warehouses.Add(qd.Product.Warehouse);
+                }
+
+                sw.Stop();
+                Console.WriteLine("Took {0} sec", sw.ElapsedMilliseconds / 1000.0);
+            }
+
         }
 
         [Test]
