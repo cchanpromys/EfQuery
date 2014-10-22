@@ -26,38 +26,54 @@ namespace EfQuery.Test
         [Test]
         public void ViewModelSum()
         {
+            var quotes = new List<Quote>();
             var result = new List<Report>();
 
+            double warmUpTime, queryTime, sumTime;
             using (var db = new Context())
             {
                 var sw = Stopwatch.StartNew();
-                for (int i = 0; i <= TotalQuotes / PageSize; i++)
-                {
-                    var reports = db.Quotes
-                                    .Include("QuoteDetails")
-                                    .OrderBy(x => x.Id)
-                                    .Skip(i*PageSize).Take(PageSize)
-                                    .ToList()
-                                    .Select(x => new Report
-                                        {
-                                            Name = x.Name,
-                                            Total = x.Total
-                                        });
 
-                    result.AddRange(reports);
+                //warmup
+                db.Products.First();
+                sw.Stop();
+                warmUpTime = sw.ElapsedMilliseconds/1000.0;
+
+                sw.Restart();
+                for (int i = 0; i <= TotalQuotes/PageSize; i++)
+                {
+                    var r = db.Quotes
+                              .Include("QuoteDetails")
+                              .OrderBy(x => x.Id)
+                              .Skip(i*PageSize).Take(PageSize)
+                              .ToList();
+
+                    quotes.AddRange(r);
                 }
 
                 sw.Stop();
+                queryTime = sw.ElapsedMilliseconds/1000.0;
+
+                sw.Restart();
+                result = quotes.Select(x => new Report {Name = x.Name, Total = x.Total}).ToList();
+                sw.Stop();
+                sumTime = sw.ElapsedMilliseconds/1000.0;
 
                 var numQ = result.Count();
                 var numQdPerQ = db.Quotes.First().QuoteDetails.Count;
 
+                var total = warmUpTime + queryTime + sumTime;
+
                 Console.WriteLine(
                     "Took {0}s to process {1} Quotes. Each of them contains {2} line items. We did {3} addition and {3} multiplication all in memory.",
-                    sw.ElapsedMilliseconds/1000.0,
+                    total,
                     numQ,
                     numQdPerQ,
                     numQ*numQdPerQ);
+
+                Console.WriteLine("Warmup took {0} ({1}%)", warmUpTime, Math.Round(warmUpTime*100.0/total, 2));
+                Console.WriteLine("Query took {0} ({1}%)", queryTime, Math.Round(queryTime*100.0/total, 2));
+                Console.WriteLine("Sum took {0} ({1}%)", sumTime, Math.Round(sumTime*100.0/total, 2));
             }
 
             //foreach (var r in result)
