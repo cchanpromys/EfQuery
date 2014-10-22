@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
+using EntityFramework.BulkInsert.Extensions;
 using NUnit.Framework;
 
 namespace EfQuery.Test
@@ -11,9 +12,9 @@ namespace EfQuery.Test
     [TestFixture]
     public class QueryTest
     {
-        const int TotalQuotes = 100000;
+        const int TotalQuotes = 1000;
         const int NumOfLineItemsPerQuote = 100;
-        const int PageSize = 50000;
+        const int PageSize = 5000;
 
         class Report
         {
@@ -128,6 +129,26 @@ namespace EfQuery.Test
         {
             using (var db = new Context())
             {
+                db.Configuration.AutoDetectChangesEnabled = false;
+                db.Configuration.ValidateOnSaveEnabled = false;
+
+                var w = new Warehouse { Name = Guid.NewGuid().ToString() };
+
+                db.Warehouses.Add(w);
+
+                var p = new Product
+                {
+                    Name = Guid.NewGuid().ToString(),
+                    Warehouse = w
+                };
+
+                db.Products.Add(p);
+
+                db.SaveChanges();
+
+                var quotes = new List<Quote>();
+                var qds = new List<QuoteDetail>();
+
                 for (int i = 1; i <= TotalQuotes; i++)
                 {
                     var q = new Quote
@@ -138,18 +159,6 @@ namespace EfQuery.Test
 
                     for (int j = 1; j <= NumOfLineItemsPerQuote; j++)
                     {
-                        var w = new Warehouse {Name = Guid.NewGuid().ToString()};
-
-                        db.Warehouses.Add(w);
-
-                        var p = new Product
-                            {
-                                Name = Guid.NewGuid().ToString(),
-                                Warehouse = w
-                            };
-
-                        db.Products.Add(p);
-
                         var qd = new QuoteDetail
                             {
                                 Name = "Line Item " + j,
@@ -160,27 +169,37 @@ namespace EfQuery.Test
                             };
 
                         q.QuoteDetails.Add(qd);
-                        db.QuoteDetails.Add(qd);
+                        qds.Add(qd);
+                        qd.Quote = q;
+                        //db.QuoteDetails.Add(qd);
                     }
 
-                    q.QuoteDetails.Add(new QuoteDetail
-                        {
-                            Name = "Deleted Item ",
-                            Quality = 999,
-                            Price = 999,
-                            Cost = 999,
-                            SystemStatus = SystemStatus.Deleted,
-                            Product = new Product {Name = Guid.NewGuid().ToString()}
-                        });
+                    quotes.Add(q);
+                    if (i%500 == 0)
+                    {
+                        db.Quotes.AddRange(quotes);
+                        //db.BulkInsert(quotes);
+                        //db.SaveChanges();
+                        //db.BulkInsert(qds);
+                        db.SaveChanges();
+                        quotes.Clear();
+                        Console.WriteLine("Flushed");
+                        //qds.Clear();
+                    }
 
-                    db.Quotes.Add(q);
+                    //db.Quotes.Add(q);
 
                     //Flush every 500 records
-                    if (i%500 == 0)
-                        db.SaveChanges();
+                    //if (i%500 == 0)
+                    //    db.SaveChanges();
                 }
 
+                db.Quotes.AddRange(quotes);
+                //db.BulkInsert(quotes);
+                //db.SaveChanges();
+                //db.BulkInsert(qds);
                 db.SaveChanges();
+               
             }
         }
     }

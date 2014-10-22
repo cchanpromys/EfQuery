@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 using NUnit.Framework;
 
 namespace EfQuery.Test
@@ -46,6 +47,45 @@ namespace EfQuery.Test
             using (var db = new Context2())
             {
                 Assert.That(db.Quotes.Any(x => x.Id == id), Is.False);
+            }
+        }
+
+        [Test]
+        public void SetIdManually()
+        {
+            int qdId;
+            using (var db = new Context())
+            {
+                var q = new Quote
+                    {
+                        QuoteDetails = new Collection<QuoteDetail>()
+                    };
+
+                var p = new Product();
+
+                var qd = new QuoteDetail
+                    {
+                        Name = "blah",
+                        Product = p
+                    };
+                db.Products.Add(p);
+                db.QuoteDetails.Add(qd);
+                db.Quotes.Add(q);
+
+                db.SaveChanges();
+
+                qdId = qd.Id;
+            }
+
+            using (var db = new Context())
+            {
+                var qd = db.QuoteDetails.Single(x => x.Id == qdId);
+
+                qd.ParentId = 6;
+
+                db.ChangeTracker.DetectChanges();
+
+                Assert.That(qd.Quote.Id == 6);
             }
         }
     }
